@@ -8,7 +8,7 @@ Collection of Javascript functions to simplify process.
  * @returns {any|false}
  */
 export function or(...arr){
-  for(let k of arr) return !!k ? k : false
+  return arr.find(e=>!!e) || false;
 }
 
 /**
