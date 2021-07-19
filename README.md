@@ -12,6 +12,15 @@ export function or(...arr){
 }
 
 /**
+ * Make sure that everything is valid before it returns true
+ * @param  {...any} arr 
+ * @returns {boolean}
+ */
+export function and(...arr){
+  return arr.find(e=>!!e);
+}
+
+/**
  * Traverse the structure of an object and returns all keys whether it's null or not 
  * @param {Object} object an object to traverse
  * @returns {Array} the result of all the keys in the object
@@ -20,7 +29,7 @@ export function traverse(object, key = ''){
   if(!object) return [key]
   return Object.keys(object).reduce((p,c)=>{
     const _ = object[c];
-    if(typeof _ === 'object')
+    if(typeof _ === 'object' && !Array.isArray(_))
       p.push(...traverse(_, [key, c].filter(Boolean).join('.')));
     else 
       p.push([key,c].filter(Boolean).join('.'))
@@ -43,7 +52,5 @@ export function traverseValue(object, ...arr){
     return p;
   }, []);
 }
-
-
 
 ```
