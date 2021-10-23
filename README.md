@@ -53,4 +53,24 @@ export function traverseValue(object, ...arr){
   }, []);
 }
 
+/**
+ * Encode text to Uint8Array. (Works better than TextEncoder())
+ */
+export function encode(str){
+  return new Uint8Array(str.split('').map(e=>e.charCodeAt(0)));
+}
+
+/**
+ * Decode buffer to string
+ */
+ export function decode(buffer){
+  return Array.from(new Uint8Array(buffer), e=>String.fromCharCode(e)).join('');
+ }
+
+/**
+ * Generate random text 
+ */
+ export function random(len){
+  return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(e=>e.toString(16).padStart(2, '0')).join('');
+ }
 ```
