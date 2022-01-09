@@ -119,7 +119,7 @@ export function encode(str){
       name : 'ECDSA',
       namedCurve : 'P-256'
     };
-    const {privateKey, publicKey} = subtle.generateKey(elliptic_crv, true, ['sign', 'verify']);
+    const {privateKey, publicKey} = await subtle.generateKey(elliptic_crv, true, ['sign', 'verify']);
     let private_jwk = await subtle.exportKey('jwk', privateKey);
     let public_jwk = await subtle.exportKey('jwk', publicKey);
         
