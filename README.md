@@ -73,4 +73,56 @@ export function encode(str){
  export function random(len){
   return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(e=>e.toString(16).padStart(2, '0')).join('');
  }
+ 
+ /**
+  * Generate VAPID Key
+  */
+  export async function generateVapidKey(){
+    function bin2hex(str){
+      let _ = '',i = 0;
+      for(; i < str.length; i++)
+        _+= str[i].charCodeAt().toString(16).padStart(2, '0');
+      return _;
+    }
+
+    function hex2bin(str){
+      let _ = '', i = 0;
+      for(; i < str.length; i+=2)
+        _+= String.fromCharCode(parseInt(str.substr(i,2), 16));
+      return _;
+    }
+    
+    function swap(str, to_underscore = false){
+      return to_underscore ? 
+        str.replace(/(\+|\/)/g, e=>e === '+' ? '-' : '_') : 
+        str.replace(/(\-|_)/g, e=>e === '-' ? '+' : '/'); 
+    }
+    
+    function JWK2Key(jwk){
+      let {x,y,d} = jwk;
+
+      if(d){
+        d = d.replace(/(-|_)/g, e=>e == '-' ? '+' : '/');
+        d = bin2hex(atob(d)).padStart(64, '0');
+        return btoa(hex2bin(d)).replace(/=/g, '');
+      }
+      else{
+        x = x.replace(/(-|_)/g, e=>e == '-' ? '+' : '/');
+        y = y.replace(/(-|_)/g, e=>e == '-' ? '+' : '/');
+        x = bin2hex(atob(x)).padStart(64, '0');
+        y = bin2hex(atob(y)).padStart(64, '0');
+        return (btoa(hex2bin('04' + x + y))).replace(/=/g, '');
+      }
+    }
+    const {subtle} = crypto;
+    const elliptic_crv = {
+      name : 'ECDSA',
+      namedCurve : 'P-256'
+    };
+    const {privateKey, publicKey} = subtle.generateKey(elliptic_crv, true, ['sign', 'verify']);
+    let private_jwk = await subtle.exportKey('jwk', privateKey);
+    let public_jwk = await subtle.exportKey('jwk', publicKey);
+        
+    return {privateKey: JWK2Key(private_jwk), publicKey : JWK2Key(public_jwk)}    
+  }
 ```
